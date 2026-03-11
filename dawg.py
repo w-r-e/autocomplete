@@ -9,7 +9,7 @@ class DawgNode:
 
 class DAWG:
     root: DawgNode
-    register:defaultdict
+    register: defaultdict
 
     # registry contians the unqiue subtrees already processed, signature: node where signature is the unique marker
     # need to minimise:

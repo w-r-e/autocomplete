@@ -103,7 +103,7 @@ def main():
     suggestions_listbox = Listbox(root, width=50, bg="black", fg="light blue", selectbackground="blue")
     suggestions_listbox.pack(padx=10, pady=10)
 
-    #entry.bind("<KeyRelease>", lambda event: update_suggestions(trie, entry, suggestions_listbox))
+    entry.bind("<KeyRelease>", lambda event: update_suggestions(trie, entry, suggestions_listbox))
     root.mainloop()
 
 
