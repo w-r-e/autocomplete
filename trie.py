@@ -3,7 +3,15 @@ from collections import defaultdict
 
 
 class TrieNode:
-    """Class that represents a Node in the Trie"""
+    """
+    Class that represents a Node in the Trie.
+
+    Instance Attributes:
+        - children: A defaultdict containing the TrieNode children connected to this node.
+        - is_end: A boolean signifying wheter the node represents the end of a word.
+        - weight: The associated frequency of a word. Equals 0 unless is_end is true.
+        - max_weight: The maximum weight of all the children.
+    """
     __slots__ = ("children", "is_end", "weight", "max_weight")
 
     def __init__(self):
