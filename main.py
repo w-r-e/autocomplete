@@ -1,7 +1,10 @@
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
-from tkinter import Tk, Entry, Listbox, Button, Frame, END
+from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
+import visualizations
+import timeit
+
 
 def load_words(filename):
     """Method used to load words from a local CSV."""
@@ -44,75 +47,23 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
     for suggestion in structure.search(prefix, k=10):
         suggestions_listbox.insert(END, suggestion)
 
-
-def export_tree(structure: Trie | RadixTree, filename: str = "tree_dump.txt") -> None:
-    """Exports a ASCII tree visualization of the structure."""
-
-    def write_trie(node, prefix, f, indent="", last=True, char=""):
-        """Recursivley traverses a regular Trie in order to create a file that visualises the tree"""
-        connector = "└── " if last else "├── "
-
-        if char:
-            label = char
-            if node.is_end:
-                label += f" ({prefix}, w={node.weight})"
-            f.write(indent + connector + label + "\n")
-
-        children = list(node.children.items())
-
-        for i, (c, child) in enumerate(children):
-            is_last = i == len(children) - 1
-            new_indent = indent + ("    " if last else "│   ")
-            write_trie(child, prefix + c, f, new_indent, is_last, c)
-
-    def write_radix(node, prefix, f, indent="", last=True, label=""):
-        """Recursivley traverses a Radix Trie in order to create a file that visualises the tree"""
-        connector = "└── " if last else "├── "
-
-        if label:
-            display = label
-            if node.is_end:
-                display += f" ({prefix}, w={node.weight})"
-            f.write(indent + connector + display + "\n")
-
-        children = list(node.children.items())
-
-        for i, (edge, child) in enumerate(children):
-            is_last = i == len(children) - 1
-            new_indent = indent + ("    " if last else "│   ")
-            write_radix(child, prefix + edge, f, new_indent, is_last, edge)
-
-    with open(filename, "w") as f:
-
-        if isinstance(structure, Trie):
-            f.write("TRIE STRUCTURE\n")
-            f.write("root\n")
-            children = list(structure.root.children.items())
-
-            for i, (c, child) in enumerate(children):
-                write_trie(child, c, f, "", i == len(children) - 1, c)
-
-        else:
-            f.write("RADIX TREE STRUCTURE\n")
-            f.write("root\n")
-            children = list(structure.root.children.items())
-
-            for i, (edge, child) in enumerate(children):
-                write_radix(child, edge, f, "", i == len(children) - 1, edge)
-
-    print(f"Tree exported to {filename}")
-
-
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 
     # Pre-build all structures
+    time1 = timeit.timeit(lambda: trie_setup(words), number=5)
     trie = trie_setup(words)
+    visualizations.export_tree(trie, "trie.txt")
+
+    time2 = timeit.timeit(lambda: radix_tree_setup(words), number=5)
     radix = radix_tree_setup(words)
+    visualizations.export_tree(radix, "radix.txt")
+
+    time3 = timeit.timeit(lambda: dawg_setup(words), number=5)
     dawg = dawg_setup(words)
 
     # Default structure
-    current_structure = {"obj": trie, "name": "trie"}
+    current_structure = {"obj": trie, "name": "trie", "time": time1}
 
     root = Tk()
     root.config(bg="dark grey")
@@ -121,16 +72,23 @@ if __name__ == "__main__":
     def switch_structure(name):
         if name == "trie":
             current_structure["obj"] = trie
+            current_structure["time"] = time1
+
         elif name == "radix":
             current_structure["obj"] = radix
+            current_structure["time"] = time2
         else:
             current_structure["obj"] = dawg
+            current_structure["time"] = time3
 
         current_structure["name"] = name
         root.title(f"Autocomplete App ({name})")
 
         # Clear suggestions when switching
         suggestions_listbox.delete(0, END)
+
+        # Update entry box with setup time
+        entry_box.config(text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds")
 
     def on_key_release(event):
         update_suggestions(current_structure["obj"], entry, suggestions_listbox)
@@ -155,6 +113,9 @@ if __name__ == "__main__":
         selectbackground="blue"
     )
     suggestions_listbox.pack(padx=10, pady=10)
+
+    entry_box = Label(root, text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds")
+    entry_box.pack(pady=10)
 
     entry.bind("<KeyRelease>", on_key_release)
 
