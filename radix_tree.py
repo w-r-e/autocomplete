@@ -37,14 +37,6 @@ class RadixTree:
     def __init__(self):
         self.root = RadixNode()
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
-    def insert(self, word: str, weight: int) -> None:
-        """Insert *word* with the given *weight* into the tree."""
-        self._insert(self.root, word, weight)
-
     def search(self, prefix: str, k: int = 10) -> list[str]:
         """Return the top-k words (by weight) that start with *prefix*."""
         node, remainder = self._find_prefix_node(self.root, prefix)
@@ -58,19 +50,14 @@ class RadixTree:
         self._find_suggestions(node, prefix + remainder, suggestions, k, -1)
         return [word for word, _ in suggestions]
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def _common_prefix_len(a: str, b: str) -> int:
+    def _common_prefix_len(self, a: str, b: str) -> int:
         """Return the length of the longest common prefix of *a* and *b*."""
         i = 0
         while i < len(a) and i < len(b) and a[i] == b[i]:
             i += 1
         return i
 
-    def _insert(self, root: RadixNode, word: str, weight: int) -> None:
+    def insert(self, word: str, weight: int) -> None:
         """
         Iterative insert of *word* / *weight* starting from *root*.
 
@@ -83,7 +70,7 @@ class RadixTree:
         4. Partial match  →  split the edge at the common-prefix boundary,
            creating an intermediate node and (up to) two children.
         """
-        node = root
+        node = self.root
         node.max_weight = max(node.max_weight, weight)
         remaining = word
 

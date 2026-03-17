@@ -182,55 +182,6 @@ class IncrementalDAWG:
             self._collect(child, path + ch, results)
 
 
-def update_suggestions(dawg, entry, suggestions_listbox):
-    """Updates the suggestions based on the changes from the recent user entry."""
-    prefix = entry.get()
-    suggestions_listbox.delete(0, END)
-    if not prefix:
-        return
-    suggestions = dawg.search(prefix)[:10]  # top 10
-    for word in suggestions:
-        suggestions_listbox.insert(END, word)
-
-
-def load_words(filename):
-    """Method used to load words from a local CSV."""
-    words = []
-    with open(filename, 'r') as f:
-        for line in f:
-            word, count = line.strip().split(',', 1)
-            words.append((word, int(count)))
-    return sorted(words, key=lambda x: x[0])
-
-
-def main():
-    """Main function that packages the Trie setup"""
-    # Set the path to the file you'd like to load
-    file_path = "unigram_freq.csv"
-    dawg = IncrementalDAWG()
-
-    words = load_words(file_path)
-    for word, count in words:
-        dawg.insert(word, count)
-
-    root = Tk()
-    root.config(bg="dark grey")
-    root.title("Autocomplete App")
-
-    entry = Entry(root)
-    entry.pack(padx=10, pady=10)
-
-    suggestions_listbox = Listbox(root, width=50, bg="black", fg="light blue", selectbackground="blue")
-    suggestions_listbox.pack(padx=10, pady=10)
-
-    entry.bind("<KeyRelease>", lambda _: update_suggestions(dawg, entry, suggestions_listbox))
-    root.mainloop()
-
-
-if __name__ == "__main__":
-    main()
-
-
 # THE MESS
 # class DAWG:
 #     """
