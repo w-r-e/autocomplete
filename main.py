@@ -1,31 +1,39 @@
 from trie import Trie
 from radix_tree import RadixTree
+from dawg import IncrementalDAWG
 from tkinter import Tk, Entry, Listbox, END
 
-def load_words(filename) -> dict[str, int]:
+def load_words(filename):
     """Method used to load words from a local CSV."""
-    words = dict()
+    words = []
     with open(filename, 'r') as f:
         for line in f:
             word, count = line.strip().split(',', 1)
-            words[word] = int(count)
-    return words
+            words.append((word, int(count)))
+    return sorted(words, key=lambda x: x[0])
 
 def trie_setup(words: dict[str, int]) -> Trie:
     """Sets up the Trie with the given words and their weights."""
     t = Trie()
-    for word, count in words.items():
+    for word, count in words:
         t.insert(word, count)
     return t
 
 def radix_tree_setup(words: dict[str, int]) -> RadixTree:
     """Sets up the RadixTree with the given words and their weights."""
     rt = RadixTree()
-    for word, count in words.items():
+    for word, count in words:
         rt.insert(word, count)
     return rt
 
-def update_suggestions(structure: Trie | RadixTree, entry: Entry, suggestions_listbox: Listbox) -> None:
+def dawg_setup(words: dict[str, int]) -> IncrementalDAWG:
+    """Sets up the IncrementalDAWG with the given words and their weights."""
+    dawg = IncrementalDAWG()
+    for word, count in words:
+        dawg.insert(word, count)
+    return dawg
+
+def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Entry, suggestions_listbox: Listbox) -> None:
     """Updates the suggestions listbox using whichever structure is currently active."""
     prefix = entry.get()
     suggestions_listbox.delete(0, END)
@@ -92,13 +100,15 @@ def export_tree(structure: Trie | RadixTree, filename: str = "tree_dump.txt") ->
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 
-    choice = input("Which structure? (trie / radix): ").strip().lower()
+    choice = input("Which structure? (trie / radix / dawg): ").strip().lower()
     if choice == "radix":
         structure = radix_tree_setup(words)
-    else:
+    elif choice == "trie":
         structure = trie_setup(words)
+    else:
+        structure = dawg_setup(words)
 
-    export_tree(structure)
+    #export_tree(structure)
 
     root = Tk()
     root.config(bg="dark grey")
