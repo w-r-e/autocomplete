@@ -102,6 +102,7 @@ def export_tree(structure: Trie | RadixTree, filename: str = "tree_dump.txt") ->
 
     print(f"Tree exported to {filename}")
 
+
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 

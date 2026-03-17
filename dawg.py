@@ -50,7 +50,7 @@ class DAWGNode:
             child_items = []
             for ch, child in sorted(self.children.items()):
                 if child.is_end:
-                    child_items.append((ch,"end"))
+                    child_items.append((ch, "end"))
                 else:
                     child_items.append((ch, child.signature))
             self.signature = (False, tuple(child_items))
@@ -132,28 +132,10 @@ class IncrementalDAWG:
                     stored.word_grave.extend(child.word_grave)
                     child.word_grave = []
 
-                for j in range(i + 1, len(self.unchecked)):
-                    p, c, ch = self.unchecked[j]
-                    if ch is child:
-                        self.unchecked[j] = (p, c, stored)
-
             else:
                 self.register[sig] = child
 
             self.unchecked.pop()
-
-    def _print_structure(self):
-        """Debug method to print the DAWG structure"""
-
-        def print_node(node, path, depth):
-            indent = "  " * depth
-            if node.word_grave:
-                words = [w for w, _ in node.word_grave]
-                print(f"{indent}{path} -> END: {words}")
-            for ch, child in sorted(node.children.items()):
-                print_node(child, path + ch, depth + 1)
-
-        print_node(self.root, "", 0)
 
     def search(self, prefix: str, k: int = 10) -> list[str]:
         """Return the top 10 words starting with prefix."""
@@ -171,7 +153,6 @@ class IncrementalDAWG:
 
     def _collect(self, node: DAWGNode, path: str, results: list) -> None:
         """Recursively collects all words that have the prefix 'path'"""
-        """Collect all words in this subtree that actually start with the path."""
         for word, weight in node.word_grave:
             # verify the word starts with our path :)
             if word.startswith(path):
