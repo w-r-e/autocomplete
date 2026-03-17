@@ -108,7 +108,7 @@ if __name__ == "__main__":
     else:
         structure = dawg_setup(words)
 
-    #export_tree(structure)
+    export_tree(structure)
 
     root = Tk()
     root.config(bg="dark grey")
