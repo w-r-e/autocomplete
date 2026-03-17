@@ -1,8 +1,10 @@
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
-from tkinter import Tk, Entry, Listbox, Button, Frame, END
+from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
 import visualizations
+import timeit
+
 
 def load_words(filename):
     """Method used to load words from a local CSV."""
@@ -49,14 +51,19 @@ if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 
     # Pre-build all structures
+    time1 = timeit.timeit(lambda: trie_setup(words), number=5)
     trie = trie_setup(words)
     visualizations.export_tree(trie, "trie.txt")
+
+    time2 = timeit.timeit(lambda: radix_tree_setup(words), number=5)
     radix = radix_tree_setup(words)
     visualizations.export_tree(radix, "radix.txt")
+
+    time3 = timeit.timeit(lambda: dawg_setup(words), number=5)
     dawg = dawg_setup(words)
 
     # Default structure
-    current_structure = {"obj": trie, "name": "trie"}
+    current_structure = {"obj": trie, "name": "trie", "time": time1}
 
     root = Tk()
     root.config(bg="dark grey")
@@ -65,16 +72,23 @@ if __name__ == "__main__":
     def switch_structure(name):
         if name == "trie":
             current_structure["obj"] = trie
+            current_structure["time"] = time1
+
         elif name == "radix":
             current_structure["obj"] = radix
+            current_structure["time"] = time2
         else:
             current_structure["obj"] = dawg
+            current_structure["time"] = time3
 
         current_structure["name"] = name
         root.title(f"Autocomplete App ({name})")
 
         # Clear suggestions when switching
         suggestions_listbox.delete(0, END)
+
+        # Update entry box with setup time
+        entry_box.config(text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds")
 
     def on_key_release(event):
         update_suggestions(current_structure["obj"], entry, suggestions_listbox)
@@ -100,7 +114,9 @@ if __name__ == "__main__":
     )
     suggestions_listbox.pack(padx=10, pady=10)
 
+    entry_box = Label(root, text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds")
+    entry_box.pack(pady=10)
+
     entry.bind("<KeyRelease>", on_key_release)
 
     root.mainloop()
-    visualizations.visualize_dawg(dawg)
