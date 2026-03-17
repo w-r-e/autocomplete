@@ -2,6 +2,7 @@ from trie import Trie
 from radix_tree import RadixTree
 from tkinter import Tk, Entry, Listbox, END
 
+
 def load_words(filename) -> dict[str, int]:
     """Method used to load words from a local CSV."""
     words = dict()
@@ -11,6 +12,7 @@ def load_words(filename) -> dict[str, int]:
             words[word] = int(count)
     return words
 
+
 def trie_setup(words: dict[str, int]) -> Trie:
     """Sets up the Trie with the given words and their weights."""
     t = Trie()
@@ -18,12 +20,14 @@ def trie_setup(words: dict[str, int]) -> Trie:
         t.insert(word, count)
     return t
 
+
 def radix_tree_setup(words: dict[str, int]) -> RadixTree:
     """Sets up the RadixTree with the given words and their weights."""
     rt = RadixTree()
     for word, count in words.items():
         rt.insert(word, count)
     return rt
+
 
 def update_suggestions(structure: Trie | RadixTree, entry: Entry, suggestions_listbox: Listbox) -> None:
     """Updates the suggestions listbox using whichever structure is currently active."""
@@ -34,10 +38,12 @@ def update_suggestions(structure: Trie | RadixTree, entry: Entry, suggestions_li
     for suggestion in structure.search(prefix, k=10):
         suggestions_listbox.insert(END, suggestion)
 
+
 def export_tree(structure: Trie | RadixTree, filename: str = "tree_dump.txt") -> None:
     """Exports a ASCII tree visualization of the structure."""
 
     def write_trie(node, prefix, f, indent="", last=True, char=""):
+        """Recursivley traverses a regular Trie in order to create a file that visualises the tree"""
         connector = "└── " if last else "├── "
 
         if char:
@@ -54,6 +60,7 @@ def export_tree(structure: Trie | RadixTree, filename: str = "tree_dump.txt") ->
             write_trie(child, prefix + c, f, new_indent, is_last, c)
 
     def write_radix(node, prefix, f, indent="", last=True, label=""):
+        """Recursivley traverses a Radix Trie in order to create a file that visualises the tree"""
         connector = "└── " if last else "├── "
 
         if label:
