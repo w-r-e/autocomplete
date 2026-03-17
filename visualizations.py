@@ -3,50 +3,62 @@ import matplotlib.pyplot as plt
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
-def visualize_dawg(dawg):
+
+def visualize_dawg(dawg: IncrementalDAWG) -> None:
     """Visualize the IncrementalDAWG using NetworkX."""
 
-    G = nx.DiGraph()
-    visited = set()
 
-    def traverse(node):
-        if node.node_id in visited:
-            return
-        visited.add(node.node_id)
+def export_tree(structure: Trie | RadixTree, filename: str) -> None:
+    """Exports a ASCII tree visualization of the structure."""
 
-        # Create node label
-        label = f"id={node.node_id}"
-        if node.word_grave:
-            words = "\n".join([f"{w} ({wt})" for w, wt in node.word_grave])
-            label += f"\n{words}"
+    def write_trie(node, prefix, f, indent="", last=True, char=""):
+        connector = "└── " if last else "├── "
 
-        G.add_node(node.node_id, label=label)
+        if char:
+            label = char
+            if node.is_end:
+                label += f" ({prefix}, w={node.weight})"
+            f.write(indent + connector + label + "\n")
 
-        for ch, child in node.children.items():
-            G.add_edge(node.node_id, child.node_id, label=ch)
-            traverse(child)
+        children = list(node.children.items())
 
-    traverse(dawg.root)
+        for i, (c, child) in enumerate(children):
+            is_last = i == len(children) - 1
+            new_indent = indent + ("    " if last else "│   ")
+            write_trie(child, prefix + c, f, new_indent, is_last, c)
 
-    # Layout
-    pos = nx.spring_layout(G, seed=42)
+    def write_radix(node, prefix, f, indent="", last=True, label=""):
+        connector = "└── " if last else "├── "
 
-    node_labels = nx.get_node_attributes(G, "label")
-    edge_labels = nx.get_edge_attributes(G, "label")
+        if label:
+            display = label
+            if node.is_end:
+                display += f" ({prefix}, w={node.weight})"
+            f.write(indent + connector + display + "\n")
 
-    plt.figure(figsize=(12, 8))
+        children = list(node.children.items())
 
-    nx.draw(
-        G,
-        pos,
-        with_labels=False,
-        node_size=1800,
-        node_color="lightblue",
-        arrows=True
-    )
+        for i, (edge, child) in enumerate(children):
+            is_last = i == len(children) - 1
+            new_indent = indent + ("    " if last else "│   ")
+            write_radix(child, prefix + edge, f, new_indent, is_last, edge)
 
-    nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=9)
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+    with open(filename, "w") as f:
 
-    plt.title("Incremental DAWG Visualization")
-    plt.show()
+        if isinstance(structure, Trie):
+            f.write("TRIE STRUCTURE\n")
+            f.write("root\n")
+            children = list(structure.root.children.items())
+
+            for i, (c, child) in enumerate(children):
+                write_trie(child, c, f, "", i == len(children) - 1, c)
+
+        else:
+            f.write("RADIX TREE STRUCTURE\n")
+            f.write("root\n")
+            children = list(structure.root.children.items())
+
+            for i, (edge, child) in enumerate(children):
+                write_radix(child, edge, f, "", i == len(children) - 1, edge)
+
+    print(f"Tree exported to {filename}")
