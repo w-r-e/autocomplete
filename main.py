@@ -1,7 +1,7 @@
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
-from tkinter import Tk, Entry, Listbox, END
+from tkinter import Tk, Entry, Listbox, Button, Frame, END
 
 def load_words(filename):
     """Method used to load words from a local CSV."""
@@ -100,25 +100,56 @@ def export_tree(structure: Trie | RadixTree, filename: str = "tree_dump.txt") ->
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 
-    choice = input("Which structure? (trie / radix / dawg): ").strip().lower()
-    if choice == "radix":
-        structure = radix_tree_setup(words)
-    elif choice == "trie":
-        structure = trie_setup(words)
-    else:
-        structure = dawg_setup(words)
+    # Pre-build all structures
+    trie = trie_setup(words)
+    radix = radix_tree_setup(words)
+    dawg = dawg_setup(words)
 
-    export_tree(structure)
+    # Default structure
+    current_structure = {"obj": trie, "name": "trie"}
 
     root = Tk()
     root.config(bg="dark grey")
-    root.title(f"Autocomplete App ({choice})")
+    root.title("Autocomplete App")
 
+    def switch_structure(name):
+        if name == "trie":
+            current_structure["obj"] = trie
+        elif name == "radix":
+            current_structure["obj"] = radix
+        else:
+            current_structure["obj"] = dawg
+
+        current_structure["name"] = name
+        root.title(f"Autocomplete App ({name})")
+
+        # Clear suggestions when switching
+        suggestions_listbox.delete(0, END)
+
+    def on_key_release(event):
+        update_suggestions(current_structure["obj"], entry, suggestions_listbox)
+
+    # Buttons
+    button_frame = Frame(root, bg="dark grey")
+    button_frame.pack(pady=5)
+
+    Button(button_frame, text="Trie", command=lambda: switch_structure("trie")).pack(side="left", padx=5)
+    Button(button_frame, text="Radix", command=lambda: switch_structure("radix")).pack(side="left", padx=5)
+    Button(button_frame, text="DAWG", command=lambda: switch_structure("dawg")).pack(side="left", padx=5)
+
+    # Entry + suggestions
     entry = Entry(root)
     entry.pack(padx=10, pady=10)
 
-    suggestions_listbox = Listbox(root, width=50, bg="black", fg="light blue", selectbackground="blue")
+    suggestions_listbox = Listbox(
+        root,
+        width=50,
+        bg="black",
+        fg="light blue",
+        selectbackground="blue"
+    )
     suggestions_listbox.pack(padx=10, pady=10)
 
-    entry.bind("<KeyRelease>", lambda event: update_suggestions(structure, entry, suggestions_listbox))
+    entry.bind("<KeyRelease>", on_key_release)
+
     root.mainloop()
