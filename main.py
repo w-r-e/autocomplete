@@ -59,7 +59,7 @@ if __name__ == "__main__":
     radix = radix_tree_setup(words)
     visualizations.export_tree(radix, "radix.txt")
 
-    time3 = timeit.timeit(lambda: dawg_setup(words), number=)
+    time3 = timeit.timeit(lambda: dawg_setup(words), number=1)
     dawg = dawg_setup(words)
 
     # Default structure
