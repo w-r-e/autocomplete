@@ -13,12 +13,14 @@ def load_words(filename):
             words.append((word, int(count)))
     return sorted(words, key=lambda x: x[0])
 
+
 def trie_setup(words: dict[str, int]) -> Trie:
     """Sets up the Trie with the given words and their weights."""
     t = Trie()
     for word, count in words:
         t.insert(word, count)
     return t
+
 
 def radix_tree_setup(words: dict[str, int]) -> RadixTree:
     """Sets up the RadixTree with the given words and their weights."""
