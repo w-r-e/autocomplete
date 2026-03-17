@@ -10,16 +10,21 @@ class DAWGNode:
     """Class that represents a Node in the Directed Acyclic Word Graph (DAWG).
 
     Instance Attributes:
-        - children: A defaultdict containing the list of children connected to this node.
+        - children: A dict containing the children connected to this node.
+        - word_grave: A list containing all words that end at this node
         - is_end: A boolean signifying wheter the node represents the end of a word.
         - signature: The unique identifier for this node, used to for merging in the DAWG
                      minimization algorithm.
     """
-    __slots__ = ("children", "is_end", "signature")
+    __slots__ = ("children", "word_grave", "is_end", "node_id",  "signature")
+    _next_node: int = 0
 
     def __init__(self):
         self.children = {}
+        self.word_grave = []
         self.is_end = False
+        self.node_id = DAWGNode._next_node
+        DAWGNode._next_node += 1
         self.signature = None
 
     def gen_signature(self):
@@ -38,11 +43,15 @@ class DAWGNode:
         # likely event if they aren't.
 
         child_items = []
-        for ch, child in sorted(self.children.items()):
-            # child.signature must already be computed
-            # Works since we work post-order in the DAWG
-            child_items.append((ch, child.signature))
-        self.signature = (self.is_end, tuple(child_items))
+        # child.signature must already be computed
+        # Works since we work post-order in the DAWG
+        if self.is_end:
+            self.signature = (True, self.node_id)  # Every end node is unique!
+        else:
+            child_items = []
+            for ch, child in sorted(self.children.items()):
+                child_items.append((ch, child.signature))
+            self.signature = (False, tuple(child_items))
         return self.signature
 
 
@@ -74,7 +83,7 @@ class IncrementalDAWG:
         self.unchecked = []
         self.register = {}
 
-    def insert(self, word):
+    def insert(self, word, weight):
         """Inserts the characters of a word into the DAWG."""
         if word < self.prev_word:
             raise ValueError("Words must be inserted in lexicographic order")
@@ -103,6 +112,7 @@ class IncrementalDAWG:
             node = new
 
         node.is_end = True
+        node.word_grave.append((word, weight))
         self.prev_word = word
 
     def _minimize_suffix(self, down_to):
@@ -113,14 +123,19 @@ class IncrementalDAWG:
             sig = child.gen_signature()
 
             if sig in self.register:
-                parent.children[char] = self.register[sig]
+                stored = self.register[sig]
+                parent.children[char] = stored
+
+                if child.word_grave:
+                    stored.word_grave.extend(child.word_grave)
+                    child.word_grave = []
             else:
                 self.register[sig] = child
 
             self.unchecked.pop()
 
-    def search(self, prefix: str) -> list[str]:
-        """Return all words starting with prefix."""
+    def search(self, prefix: str, k: int = 10) -> list[str]:
+        """Return the top 10 words starting with prefix."""
         node = self.root
         for ch in prefix:
             if ch not in node.children:
@@ -129,12 +144,19 @@ class IncrementalDAWG:
         # Now collect all completions
         results = []
         self._collect(node, prefix, results)
-        return results
 
-    def _collect(self, node: DAWGNode, path: str, results: list[str]) -> None:
+        results.sort(key=lambda x: x[1], reverse=True)
+        return [word for word, _ in results[:k]]
+
+    def _collect(self, node: DAWGNode, path: str, results: list) -> None:
         """Recursively collects all words that have the prefix 'path'"""
-        if node.is_end:
-            results.append(path)
+        """Collect all words in this subtree that actually start with the path."""
+        for word, weight in node.word_grave:
+            # verify the word starts with our path :)))
+            if word.startswith(path):
+                results.append((word, weight))
+
+        # recurse into the children
         for ch, child in sorted(node.children.items()):
             self._collect(child, path + ch, results)
 
@@ -155,9 +177,9 @@ def load_words(filename):
     words = []
     with open(filename, 'r') as f:
         for line in f:
-            word, _ = line.strip().split(',', 1)
-            words.append(word)
-    return sorted(words)
+            word, count = line.strip().split(',', 1)
+            words.append((word, int(count)))
+    return sorted(words, key=lambda x: x[0])
 
 
 def main():
@@ -167,8 +189,8 @@ def main():
     dawg = IncrementalDAWG()
 
     words = load_words(file_path)
-    for word in words:
-        dawg.insert(word)
+    for word, count in words:
+        dawg.insert(word, count)
 
     root = Tk()
     root.config(bg="dark grey")
