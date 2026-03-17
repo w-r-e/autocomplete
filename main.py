@@ -51,15 +51,15 @@ if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 
     # Pre-build all structures
-    time1 = timeit.timeit(lambda: trie_setup(words), number=5)
+    time1 = timeit.timeit(lambda: trie_setup(words), number=1)
     trie = trie_setup(words)
     visualizations.export_tree(trie, "trie.txt")
 
-    time2 = timeit.timeit(lambda: radix_tree_setup(words), number=5)
+    time2 = timeit.timeit(lambda: radix_tree_setup(words), number=1)
     radix = radix_tree_setup(words)
     visualizations.export_tree(radix, "radix.txt")
 
-    time3 = timeit.timeit(lambda: dawg_setup(words), number=5)
+    time3 = timeit.timeit(lambda: dawg_setup(words), number=)
     dawg = dawg_setup(words)
 
     # Default structure
@@ -92,6 +92,8 @@ if __name__ == "__main__":
 
     def on_key_release(event):
         update_suggestions(current_structure["obj"], entry, suggestions_listbox)
+        suggestion_time = timeit.timeit(lambda: update_suggestions(current_structure["obj"], entry, suggestions_listbox), number=1)
+        entry_box.config(text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds\nCurrent suggestion time: {suggestion_time:.4f} seconds")
 
     # Buttons
     button_frame = Frame(root, bg="dark grey")
