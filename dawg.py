@@ -1,4 +1,4 @@
-from tkinter import Tk, Entry, Listbox, END
+import sys
 
 # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # TODO: Hey Dana... I will be using comments to explain my code! pls text me if theres any bit u dont get
@@ -162,6 +162,29 @@ class IncrementalDAWG:
         for ch, child in sorted(node.children.items()):
             self._collect(child, path + ch, results)
 
+    def get_total_memory(self):
+        """Calculate total memory usage of this DAWG."""
+        seen = set()
+        return self._measure(self.root, seen)
+
+    def _measure(self, node, seen):
+        """Recursive helper function to find the size of the node and all its children"""
+        if node in seen:
+            return 0
+        seen.add(node)
+
+        total = sys.getsizeof(node)
+        total += sys.getsizeof(node.children)
+
+        for char, child in node.children.items():
+            total += sys.getsizeof(char)
+            total += self._measure(child, seen)
+
+        total += sys.getsizeof(node.word_grave)
+        for word, weight in node.word_grave:
+            total += sys.getsizeof(word) + sys.getsizeof(weight)
+
+        return total
 
 # THE MESS
 # class DAWG:

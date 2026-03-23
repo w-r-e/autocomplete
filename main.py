@@ -1,12 +1,13 @@
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
+from typing import Any
 from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
 import visualizations
 import timeit
 
 
-def load_words(filename):
+def load_words(filename) -> list[Any]:
     """Method used to load words from a local CSV."""
     words = []
     with open(filename, 'r') as f:
@@ -16,7 +17,7 @@ def load_words(filename):
     return sorted(words, key=lambda x: x[0])
 
 
-def trie_setup(words: dict[str, int]) -> Trie:
+def trie_setup(words: list[Any]) -> Trie:
     """Sets up the Trie with the given words and their weights."""
     t = Trie()
     for word, count in words:
@@ -24,14 +25,14 @@ def trie_setup(words: dict[str, int]) -> Trie:
     return t
 
 
-def radix_tree_setup(words: dict[str, int]) -> RadixTree:
+def radix_tree_setup(words: list[Any]) -> RadixTree:
     """Sets up the RadixTree with the given words and their weights."""
     rt = RadixTree()
     for word, count in words:
         rt.insert(word, count)
     return rt
 
-def dawg_setup(words: dict[str, int]) -> IncrementalDAWG:
+def dawg_setup(words: list[Any]) -> IncrementalDAWG:
     """Sets up the IncrementalDAWG with the given words and their weights."""
     dawg = IncrementalDAWG()
     for word, count in words:
@@ -47,39 +48,55 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
     for suggestion in structure.search(prefix, k=10):
         suggestions_listbox.insert(END, suggestion)
 
+
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 
     # Pre-build all structures
     time1 = timeit.timeit(lambda: trie_setup(words), number=1)
     trie = trie_setup(words)
-    visualizations.export_tree(trie, "trie.txt")
+    space1 = trie.get_total_memory()
+    # visualizations.export_tree(trie, "trie.txt")
 
     time2 = timeit.timeit(lambda: radix_tree_setup(words), number=1)
     radix = radix_tree_setup(words)
-    visualizations.export_tree(radix, "radix.txt")
+    space2 = radix.get_total_memory()
+    # visualizations.export_tree(radix, "radix.txt")
 
     time3 = timeit.timeit(lambda: dawg_setup(words), number=1)
     dawg = dawg_setup(words)
+    space3 = dawg.get_total_memory()
 
     # Default structure
-    current_structure = {"obj": trie, "name": "trie", "time": time1}
+    current_structure = {"obj": trie, "name": "trie", "time": time1, "space": space1}
 
     root = Tk()
     root.config(bg="dark grey")
     root.title("Autocomplete App")
 
+    info_label = Label(root, text="", bg="dark grey", fg="black")
+    info_label.pack(pady=10)
+
+    def update_info_labels():
+        text = (f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds | "
+                f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB")
+        info_label.config(text=text)
+
     def switch_structure(name):
         if name == "trie":
             current_structure["obj"] = trie
             current_structure["time"] = time1
+            current_structure["space"] = space1
 
         elif name == "radix":
             current_structure["obj"] = radix
             current_structure["time"] = time2
+            current_structure["space"] = space2
+
         else:
             current_structure["obj"] = dawg
             current_structure["time"] = time3
+            current_structure["space"] = space3
 
         current_structure["name"] = name
         root.title(f"Autocomplete App ({name})")
@@ -88,12 +105,15 @@ if __name__ == "__main__":
         suggestions_listbox.delete(0, END)
 
         # Update entry box with setup time
-        entry_box.config(text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds")
+        update_info_labels()
 
     def on_key_release(event):
         update_suggestions(current_structure["obj"], entry, suggestions_listbox)
         suggestion_time = timeit.timeit(lambda: update_suggestions(current_structure["obj"], entry, suggestions_listbox), number=1)
-        entry_box.config(text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds\nCurrent suggestion time: {suggestion_time:.4f} seconds")
+        text = (f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds | "
+                f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB | "
+                f"suggestion time: {suggestion_time:.4f} seconds")
+        info_label.config(text=text)
 
     # Buttons
     button_frame = Frame(root, bg="dark grey")
@@ -116,8 +136,7 @@ if __name__ == "__main__":
     )
     suggestions_listbox.pack(padx=10, pady=10)
 
-    entry_box = Label(root, text=f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds")
-    entry_box.pack(pady=10)
+    update_info_labels()
 
     entry.bind("<KeyRelease>", on_key_release)
 

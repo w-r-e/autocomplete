@@ -1,3 +1,5 @@
+import sys
+
 class RadixNode:
     """
     Class that represents a Node in the Radix Tree.
@@ -77,10 +79,10 @@ class RadixTree:
         while remaining:
             first_char = remaining[0]
 
-            edge_label, child = None, None
+            edge_label, _ = None, None
             for label, ch in node.children.items():
                 if label[0] == first_char:
-                    edge_label, child = label, ch
+                    edge_label, _ = label, ch
                     break
 
             # Case 1 — no matching edge
@@ -222,3 +224,26 @@ class RadixTree:
             if child.max_weight <= min_weight:
                 continue
             self._find_suggestions(child, accumulated + label, suggestions, k, min_weight)
+
+    def get_total_memory(self):
+        """Calculate total memory usage of this Radix Tree."""
+        seen = set()
+        return self._measure(self.root, seen)
+
+    def _measure(self, node, seen):
+        """Recursive helper to measure memory of node and all children."""
+        if node in seen:
+            return 0
+        seen.add(node)
+
+        total = sys.getsizeof(node)
+        total += sys.getsizeof(node.children)
+
+        for label, child in node.children.items():
+            total += sys.getsizeof(label)  # The edge label string
+            total += self._measure(child, seen)
+
+        total += sys.getsizeof(node.weight)
+        total += sys.getsizeof(node.max_weight)
+
+        return total
