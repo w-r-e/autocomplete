@@ -2,7 +2,7 @@ import sys
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
-from visualizations import visualize_dawg
+import visualizations
 from typing import Any
 from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
 import timeit
@@ -58,12 +58,12 @@ if __name__ == "__main__":
     time1 = timeit.timeit(lambda: trie_setup(words), number=1)
     trie = trie_setup(words)
     space1 = trie.get_total_memory()
-    # visualizations.export_tree(trie, "trie.txt")
+    visualizations.export_tree(trie, "trie.txt")
 
     time2 = timeit.timeit(lambda: radix_tree_setup(words), number=1)
     radix = radix_tree_setup(words)
     space2 = radix.get_total_memory()
-    # visualizations.export_tree(radix, "radix.txt")
+    visualizations.export_tree(radix, "radix.txt")
 
     time3 = timeit.timeit(lambda: dawg_setup(words), number=1)
     dawg = dawg_setup(words)
