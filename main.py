@@ -1,6 +1,7 @@
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
+from visualizations import visualize_dawg
 from typing import Any
 from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
 import visualizations
@@ -141,3 +142,16 @@ if __name__ == "__main__":
     entry.bind("<KeyRelease>", on_key_release)
 
     root.mainloop()
+
+    '''words = [
+        ("bat", 5),
+        ("bath", 3),
+        ("batman", 8),
+    ]
+    words = sorted(words)
+    dawg = IncrementalDAWG()
+
+    for word, weight in words:
+        dawg.insert(word, weight)
+
+    visualize_dawg(dawg)'''
