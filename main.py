@@ -1,10 +1,10 @@
+import sys
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
 from visualizations import visualize_dawg
 from typing import Any
 from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
-import visualizations
 import timeit
 
 
@@ -51,7 +51,8 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
 
 
 if __name__ == "__main__":
-    words = load_words("unigram_freq.csv")
+    sys.setrecursionlimit(2950)
+    words = load_words("en_full.txt")
 
     # Pre-build all structures
     time1 = timeit.timeit(lambda: trie_setup(words), number=1)
