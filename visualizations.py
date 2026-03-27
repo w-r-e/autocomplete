@@ -3,36 +3,75 @@ import matplotlib.pyplot as plt
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG, DAWGNode
-import pydot
+from collections import deque, defaultdict
 
-def visualize_dawg(dawg: IncrementalDAWG) -> None:
-    """Visualize the IncrementalDAWG using NetworkX."""
+def hierarchical_layout(G, root):
+    """Create a cleaner, more structured layout for DAWG visualization"""
+
+    tiers = defaultdict(list)
+    # to group each node by depth
+    visited = set()
+
+    queue = deque([(root, 0)])
+    # starting with root note (depth 0)
+    while queue:
+        node, depth = queue.popleft()
+        # next node and depth
+        if node in visited:
+            continue
+        visited.add(node)
+
+        tiers[depth].append(node)
+        # group nodes by how far their depth is from root
+
+        for neighbor in G.successors(node):
+            queue.append((neighbor, depth + 1))
+        # add their children to queue as well
+
+    pos = {}
+    for depth, nodes in tiers.items():
+        # one row at a time
+        width = len(nodes)
+        for i, node in enumerate(nodes):
+            # use enumerate to keep track of index
+            x = i - width / 2
+            # center node at 0
+            y = -depth
+            # depth must increase downward
+            pos[node] = (x, y)
+            # store position
+
+    return pos
+
+def visualize_dawg(dawg: IncrementalDAWG, prefix: str, k: int = 10) -> None:
+    """Visualize the IncrementalDAWG subgraph of top-k autocorrrect results using NetworkX."""
     G = nx.DiGraph()
     # creates direct graph G (direct to show direction duh)
     visited = set()
-    def add_nodes_and_edges(node: DAWGNode):
-        """Recursively add nodes and edges to graph G"""
-        if node in visited:
-            return
-        visited.add(node)
-        # to prevent duplicate traversal
-        node_id = f"id{node.node_id}"
-        # gives each node a unique id
-        G.add_node(node_id, is_end=node.is_end)
+    top_words = dawg.search(prefix, k)
 
-        for let, child in node.children.items():
+    def add_nodes_and_edges(word):
+        """Add top-n nodes and edges to graph G"""
+        node = dawg.root
+        id = f"id{node.node_id}"
+        G.add_node(id, is_end=node.is_end)
+
+        for c in word:
+            child = node.children[c]
+            par_id = f"id{node.node_id}"
             child_id = f"id{child.node_id}"
+
             G.add_node(child_id, is_end=child.is_end)
-            # to make sure child has an 'is_end' if not code DOESN'T WORK
-            G.add_edge(node_id, child_id, label=let)
-            # connecting all nodes and its children with edges
-            add_nodes_and_edges(child)
-            # recursion
-    add_nodes_and_edges(dawg.root)
+            G.add_edge(par_id, child_id, label=c)
+
+            node = child
+    for word in top_words:
+        add_nodes_and_edges(word)
     colors = ['lightgreen' if G.nodes[n]['is_end'] else 'lightgray' for n in G.nodes]
     # diff colors whether the node is an end-of-the-word node or just a node
-    pos = nx.nx_pydot.graphviz_layout(G, prog="dot")
-    # position of nodes (pydot makes the visualization nice and structured)
+    # pos = nx.spring_layout(G, seed=41)
+    pos = hierarchical_layout(G, list(G.nodes)[0])
+    # position of nodes 
     plt.figure(figsize=(14, 10))
     # well we're gonna need a space for this visualization
     nx.draw(G, pos, with_labels=True, node_color=colors, node_size=1500, font_size=10)
