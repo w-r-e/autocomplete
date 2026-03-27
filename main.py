@@ -1,10 +1,10 @@
-import sys
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
-import visualizations
+from visualizations import visualize_dawg
 from typing import Any
 from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
+import visualizations
 import timeit
 
 
@@ -51,19 +51,19 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
 
 
 if __name__ == "__main__":
-    sys.setrecursionlimit(2950)
-    words = load_words("en_full.txt")
-
+    words = load_words("unigram_freq.csv")
+    dawg = dawg_setup(words)
+    '''
     # Pre-build all structures
     time1 = timeit.timeit(lambda: trie_setup(words), number=1)
     trie = trie_setup(words)
     space1 = trie.get_total_memory()
-    visualizations.export_tree(trie, "trie.txt")
+    # visualizations.export_tree(trie, "trie.txt")
 
     time2 = timeit.timeit(lambda: radix_tree_setup(words), number=1)
     radix = radix_tree_setup(words)
     space2 = radix.get_total_memory()
-    visualizations.export_tree(radix, "radix.txt")
+    # visualizations.export_tree(radix, "radix.txt")
 
     time3 = timeit.timeit(lambda: dawg_setup(words), number=1)
     dawg = dawg_setup(words)
@@ -142,17 +142,17 @@ if __name__ == "__main__":
 
     entry.bind("<KeyRelease>", on_key_release)
 
-    root.mainloop()
+    root.mainloop()'''
 
-    '''words = [
-        ("bat", 5),
-        ("bath", 3),
-        ("batman", 8),
-    ]
-    words = sorted(words)
-    dawg = IncrementalDAWG()
+    # words = [
+    #     ("bat", 5),
+    #     ("bath", 3),
+    #     ("batman", 8),
+    # ]
+    # words = sorted(words)
+    # dawg = IncrementalDAWG()
+    #
+    # for word, weight in words:
+    #     dawg.insert(word, weight)
 
-    for word, weight in words:
-        dawg.insert(word, weight)
-
-    visualize_dawg(dawg)'''
+    visualize_dawg(dawg, "ba", 10)
