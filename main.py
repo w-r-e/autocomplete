@@ -55,7 +55,7 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
     dawg = dawg_setup(words)
-    '''
+    
     # Pre-build all structures
     time1 = timeit.timeit(lambda: trie_setup(words), number=1)
     trie = trie_setup(words)
@@ -144,17 +144,6 @@ if __name__ == "__main__":
 
     entry.bind("<KeyRelease>", on_key_release)
 
-    root.mainloop()'''
-
-    # words = [
-    #     ("bat", 5),
-    #     ("bath", 3),
-    #     ("batman", 8),
-    # ]
-    # words = sorted(words)
-    # dawg = IncrementalDAWG()
-    #
-    # for word, weight in words:
-    #     dawg.insert(word, weight)
+    root.mainloop()
 
     visualize_dawg(dawg, "ba", 10)
