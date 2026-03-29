@@ -1,5 +1,13 @@
-import sys
+"""Dawg Implementation
 
+Module Description 
+===================
+
+This module includes two classes used to implement a data structure that (in this case) is used to search 
+through all the possible suffixes of a prefix the user types in and combines common ends to sort in
+a more efficient way with minimal memory usage and a better time complexity for searching."""
+
+import sys
 
 class DAWGNode:
     """Class that represents a Node in the Directed Acyclic Word Graph (DAWG).

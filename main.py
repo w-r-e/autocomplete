@@ -1,3 +1,23 @@
+"""Main Function
+
+Module Description
+==================
+
+Includes all functions and uses different files to visualize the autocomplete by mimicking a search 
+engine through the tkinter library. The user can use this interactive visualization to see a 
+demonstration of how an autocomplete algorithm would work and the efficiency of them.
+
+Instructions
+=============
+
+All libraries used are part of the Python standard library, so no external library installation is required.
+The two datasets used by the program are contained in the compressed folder datasets.zip uploaded to
+MarkUs. Please unzip the folder and move the two dataset files to the same folder as the other program
+files. Running this file starts the graphical interface described in Graphical Interface, including the button 
+to generate visualizations as described in Structural Visualization and NetworkX.
+
+"""
+
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG, DAWGNode

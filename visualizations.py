@@ -1,3 +1,14 @@
+"""
+Visualizations 
+
+Module Description
+==================
+
+Visualizes the DAWG, Radix Tree, and the Trie using NetworkX, displaying the graph
+with ASCII to better show how the implementation of each structure works and the
+difference between the three.
+"""
+
 import networkx as nx
 import matplotlib.pyplot as plt
 from trie import Trie

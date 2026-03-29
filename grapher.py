@@ -1,3 +1,13 @@
+"""Grapher
+
+Module Description 
+==================
+
+This module contains a collection of Python functions that create three different graphs that
+compares each type of data structure against dataset size to visually measure all their efficiencies
+compared to each other. 
+""" 
+
 from main import load_words, dawg_setup, trie_setup, radix_tree_setup
 from plotly import graph_objects as graph
 import random
