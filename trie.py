@@ -1,3 +1,14 @@
+"""
+Trie Implementation
+
+Module Description 
+==================
+
+This python file includes classes and functions that store the suffixes of a prefix
+the user types into the interactive visualization throughout multiple connected
+nodes in a tree, one letter in each node. 
+"""
+
 from collections import defaultdict
 import sys
 
