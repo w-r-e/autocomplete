@@ -27,19 +27,9 @@ class DAWGNode:
         Used to detect identical subtrees for merging.
         Assumes the children have the correct signature as this function will be used in a post order traversal.
         """
-
-        # Generates the signature... Just used so that we can compare nodes and then say "HEY! these two are the same"
-        # This way we can merge redundant nodes. EX: for "cats" and "bats", clearly both "t"s have the same children
-        # are both not endings of words, and have the same weight of 0 (cause word weights are stored at the end)
-        # So we can just merge them
-        # Note: We dont merge the "s"s in this example. This is because they both store different weights, so merging
-        # would make it so that merging would combine the weights, which means that they would be considered equually
-        # likely event if they aren't.
-
-        # child.signature must already be computed
-        # Works since we work post-order in the DAWG
+        
         if self.is_end:
-            self.signature = (True, self.node_id)  # Every end node is unique!
+            self.signature = (True, self.node_id)  
         else:
             child_items = []
             for ch, child in sorted(self.children.items()):
@@ -84,17 +74,12 @@ class IncrementalDAWG:
         if word < self.prev_word:
             raise ValueError("Words must be inserted in lexicographic order")
 
-        # First this bit finds the common prefix yk like if the most recent word was "carp" and the new one is "cat"
-        # it compares the characters to see which ones are common, and stops when it finds a difference
-        # Here for carp and cat it'll compare until it hits the 3rd character, see t =/= r and, then we have "ca"
-        # which is the correct common prefix. Techincally we only store its position,
         common = 0
         for a, b in zip(word, self.prev_word):
             if a != b:
                 break
             common += 1
 
-        # Calls this to minimize the new nodes in the suffix, i.e. compare them with exisiting nodes and merge
         self._minimize_suffix(common)
 
         node = self.root
@@ -138,7 +123,7 @@ class IncrementalDAWG:
             if ch not in node.children:
                 return []
             node = node.children[ch]
-        # Now collect all completions
+
         results = []
         self._collect(node, prefix, results)
 
@@ -148,11 +133,9 @@ class IncrementalDAWG:
     def _collect(self, node: DAWGNode, path: str, results: list) -> None:
         """Recursively collects all words that have the prefix 'path'"""
         for word, weight in node.word_grave:
-            # verify the word starts with our path :)
             if word.startswith(path):
                 results.append((word, weight))
 
-        # recurse into the children
         for ch, child in sorted(node.children.items()):
             self._collect(child, path + ch, results)
 
