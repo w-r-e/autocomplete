@@ -1,5 +1,6 @@
 import sys
 
+
 class DAWGNode:
     """Class that represents a Node in the Directed Acyclic Word Graph (DAWG).
 

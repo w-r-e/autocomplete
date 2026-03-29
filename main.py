@@ -11,6 +11,7 @@ import timeit
 def load_words(filename) -> list[Any]:
     """Method used to load words from a local CSV."""
     words = []
+
     with open(filename, 'r') as f:
         for line in f:
             word, count = line.strip().split(',', 1)
@@ -42,20 +43,20 @@ def dawg_setup(words: list[Any]) -> IncrementalDAWG:
         dawg.insert(word, count)
     return dawg
 
-def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Entry, suggestions_listbox: Listbox) -> None:
+
+def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Entry, listbox: Listbox) -> None:
     """Updates the suggestions listbox using whichever structure is currently active."""
     prefix = entry.get()
-    suggestions_listbox.delete(0, END)
+    listbox.delete(0, END)
     if not prefix:
         return
     for suggestion in structure.search(prefix, k=10):
-        suggestions_listbox.insert(END, suggestion)
+        listbox.insert(END, suggestion)
 
 
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
-    dawg = dawg_setup(words)
-    '''
+
     # Pre-build all structures
     time1 = timeit.timeit(lambda: trie_setup(words), number=1)
     trie = trie_setup(words)
@@ -113,7 +114,8 @@ if __name__ == "__main__":
 
     def on_key_release(event):
         update_suggestions(current_structure["obj"], entry, suggestions_listbox)
-        suggestion_time = timeit.timeit(lambda: update_suggestions(current_structure["obj"], entry, suggestions_listbox), number=1)
+        suggestion_time = timeit.timeit(
+            lambda: update_suggestions(current_structure["obj"], entry, suggestions_listbox), number=1)
         text = (f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds | "
                 f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB | "
                 f"suggestion time: {suggestion_time:.4f} seconds")
@@ -144,17 +146,7 @@ if __name__ == "__main__":
 
     entry.bind("<KeyRelease>", on_key_release)
 
-    root.mainloop()'''
+    if current_structure["name"] == "dawg":
+        visualize_dawg(dawg, "ba", 10)
 
-    # words = [
-    #     ("bat", 5),
-    #     ("bath", 3),
-    #     ("batman", 8),
-    # ]
-    # words = sorted(words)
-    # dawg = IncrementalDAWG()
-    #
-    # for word, weight in words:
-    #     dawg.insert(word, weight)
-
-    visualize_dawg(dawg, "ba", 10)
+    root.mainloop()
