@@ -3,8 +3,8 @@
 Module Description
 ==================
 
-Includes all functions and uses different files to visualize the autocomplete by mimicking a search 
-engine through the tkinter library. The user can use this interactive visualization to see a 
+Includes all functions and uses different files to visualize the autocomplete by mimicking a search
+engine through the tkinter library. The user can use this interactive visualization to see a
 demonstration of how an autocomplete algorithm would work and the efficiency of them.
 
 Instructions
@@ -13,10 +13,11 @@ Instructions
 All libraries used are part of the Python standard library, so no external library installation is required.
 The two datasets used by the program are contained in the compressed folder datasets.zip uploaded to
 MarkUs. Please unzip the folder and move the two dataset files to the same folder as the other program
-files. Running this file starts the graphical interface described in Graphical Interface, including the button 
+files. Running this file starts the graphical interface described in Graphical Interface, including the button
 to generate visualizations as described in Structural Visualization and NetworkX.
 
 """
+from sys import prefix
 
 from trie import Trie
 from radix_tree import RadixTree
@@ -139,18 +140,6 @@ if __name__ == "__main__":
                 f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB | "
                 f"suggestion time: {suggestion_time:.4f} seconds")
         info_label.config(text=text)
-
-    def visualize_current_structure():
-        """Visulaize the currently selected structure"""
-        obj = current_structure['obj']
-        name = current_structure['name']
-
-        if name == "trie":
-            visualizations.export_tree(obj, "trie.txt")
-            print("Trie exported to trie.txt")
-        elif name == "radix":
-            visualizations.export_tree(obj, "trie.txt")
-            print("Trie exported to trie.txt")
 
 
     # Buttons
