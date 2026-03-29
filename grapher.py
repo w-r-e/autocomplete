@@ -1,6 +1,3 @@
-import dawg
-import trie
-import radix_tree
 from main import load_words, dawg_setup, trie_setup, radix_tree_setup
 from plotly import graph_objects as graph
 import random
@@ -9,25 +6,31 @@ import timeit
 NUM_RUNS = 5
 
 
+def random_prefix_gen(words):
+    prefix_source = random.choices(words, k=100)
+    test_prefixes = []
+    for word, _ in prefix_source:
+        for length in range(2, 5):
+            if len(word) > length:
+                test_prefixes.append(word[:length])
+    test_prefixes = list(set(test_prefixes))[:50]
+    return test_prefixes
+
+
 def tester(words, sizes):
     results = {
         'trie': {'sizes': [], 'memory': [], 'setup_time': [], 'query_time': []},
         'radix': {'sizes': [], 'memory': [], 'setup_time': [], 'query_time': []},
         'dawg': {'sizes': [], 'memory': [], 'setup_time': [], 'query_time': []}
     }
-    test_prefixes = []
-    prefix_source = random.choices(words, k=100)
-
-    for word, _ in prefix_source:
-        for length in range(2, 5):
-            if len(word) > length:
-                test_prefixes.append(word[:length])
-    test_prefixes = list(set(test_prefixes))[:50]
 
     for size in sizes:
-        trie_result = trie_tester(size, words, test_prefixes)
-        radix_result = radix_tester(size, words, test_prefixes)
-        dawg_result = dawg_tester(size, words, test_prefixes)
+        trimmed_words = words[:size]
+        test_prefixes = random_prefix_gen(trimmed_words)
+
+        trie_result = trie_tester(size, trimmed_words, test_prefixes)
+        radix_result = radix_tester(size, trimmed_words, test_prefixes)
+        dawg_result = dawg_tester(size, trimmed_words, test_prefixes)
 
         results['trie']['sizes'].extend(trie_result['sizes'])
         results['trie']['memory'].extend(trie_result['memory'])
@@ -50,14 +53,12 @@ def tester(words, sizes):
 def trie_tester(size, words, test_prefixes):
     results = {"sizes": [], "memory": [], "setup_time": [], "query_time": []}
 
-    trimmed_words = words[:size]
-
     trie_setup_time = timeit.timeit(
-        lambda: trie_setup(trimmed_words),
+        lambda: trie_setup(words),
         number=NUM_RUNS
     ) / NUM_RUNS
 
-    trie = trie_setup(trimmed_words)
+    trie = trie_setup(words)
     trie_memory = trie.get_total_memory()
 
     def query_trie():
@@ -77,14 +78,12 @@ def trie_tester(size, words, test_prefixes):
 def radix_tester(size, words, test_prefixes):
     results = {"sizes": [], "memory": [], "setup_time": [], "query_time": []}
 
-    trimmed_words = words[:size]
-
     radix_setup_time = timeit.timeit(
-        lambda: radix_tree_setup(trimmed_words),
+        lambda: radix_tree_setup(words),
         number=NUM_RUNS
     ) / NUM_RUNS
 
-    radix = radix_tree_setup(trimmed_words)
+    radix = radix_tree_setup(words)
     radix_memory = radix.get_total_memory()
 
     def query_radix():
@@ -104,14 +103,12 @@ def radix_tester(size, words, test_prefixes):
 def dawg_tester(size, words, test_prefixes):
     results = {"sizes": [], "memory": [], "setup_time": [], "query_time": []}
 
-    trimmed_words = words[:size]
-
     dawg_setup_time = timeit.timeit(
-        lambda: dawg_setup(trimmed_words),
+        lambda: dawg_setup(words),
         number=NUM_RUNS
     ) / NUM_RUNS
 
-    dawg = dawg_setup(trimmed_words)
+    dawg = dawg_setup(words)
     dawg_memory = dawg.get_total_memory()
 
     def query_dawg():
