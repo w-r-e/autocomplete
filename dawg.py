@@ -12,9 +12,9 @@ class DAWGNode:
     Instance Attributes:
         - children: A dict containing the children connected to this node.
         - word_grave: A list containing all words that end at this node
-        - is_end: A boolean signifying wheter the node represents the end of a word.
-        - signature: The unique identifier for this node, used to for merging in the DAWG
-                     minimization algorithm.
+        - is_end: A boolean signifying whether the node represents the end of a word.
+        - node_id: An integer that denotes a unique identifier for this node.
+        - signature: The unique identifier for this node, used to for merging in the DAWG.
     """
     __slots__ = ("children", "word_grave", "is_end", "node_id",  "signature")
     _next_node: int = 0

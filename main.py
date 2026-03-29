@@ -1,6 +1,6 @@
 from trie import Trie
 from radix_tree import RadixTree
-from dawg import IncrementalDAWG
+from dawg import IncrementalDAWG, DAWGNode
 from visualizations import visualize_dawg
 from typing import Any
 from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
@@ -33,8 +33,10 @@ def radix_tree_setup(words: list[Any]) -> RadixTree:
         rt.insert(word, count)
     return rt
 
+
 def dawg_setup(words: list[Any]) -> IncrementalDAWG:
     """Sets up the IncrementalDAWG with the given words and their weights."""
+    DAWGNode._next_node = 0
     dawg = IncrementalDAWG()
     for word, count in words:
         dawg.insert(word, count)

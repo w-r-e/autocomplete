@@ -1,6 +1,7 @@
 from collections import defaultdict
 import sys
 
+
 class TrieNode:
     """
     Class that represents a Node in the Trie.

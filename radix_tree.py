@@ -1,5 +1,6 @@
 import sys
 
+
 class RadixNode:
     """
     Class that represents a Node in the Radix Tree.
