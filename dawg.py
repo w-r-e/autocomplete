@@ -4,8 +4,8 @@ Module Description
 ===================
 
 This module includes two classes used to implement a data structure that (in this case) is used to search 
-through all the possible suffixes of a prefix the user types in in a more efficient 
-way with minimal memory usage and a better time complexity for searching."""
+through all the possible suffixes of a prefix the user types in and combines common ends to sort in
+a more efficient way with minimal memory usage and a better time complexity for searching."""
 
 import sys
 
