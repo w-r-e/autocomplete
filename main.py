@@ -53,7 +53,6 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
     for suggestion in structure.search(prefix, k=10):
         listbox.insert(END, suggestion)
 
-
 if __name__ == "__main__":
     words = load_words("unigram_freq.csv")
 
@@ -120,6 +119,19 @@ if __name__ == "__main__":
                 f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB | "
                 f"suggestion time: {suggestion_time:.4f} seconds")
         info_label.config(text=text)
+
+    def visualize_current_structure():
+        """Visulaize the currently selected structure"""
+        obj = current_structure['obj']
+        name = current_structure['name']
+
+        if name == "trie":
+            visualizations.export_tree(obj, "trie.txt")
+            print("Trie exported to trie.txt")
+        elif name == "radix":
+            visualizations.export_tree(obj, "trie.txt")
+            print("Trie exported to trie.txt")
+
 
     # Buttons
     button_frame = Frame(root, bg="dark grey")
