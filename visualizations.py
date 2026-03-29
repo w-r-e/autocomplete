@@ -46,7 +46,7 @@ def hierarchical_layout(G, root):
 def visualize_dawg(dawg: IncrementalDAWG, prefix: str, k: int = 10) -> None:
     """Visualize the IncrementalDAWG subgraph of top-k autocorrrect results using NetworkX."""
     G = nx.DiGraph()
-    # creates direct graph G (direct to show direction duh)
+    # creates direct graph G
     visited = set()
     top_words = dawg.search(prefix, k)
 
@@ -69,16 +69,13 @@ def visualize_dawg(dawg: IncrementalDAWG, prefix: str, k: int = 10) -> None:
         add_nodes_and_edges(word)
     colors = ['lightgreen' if G.nodes[n]['is_end'] else 'lightgray' for n in G.nodes]
     # diff colors whether the node is an end-of-the-word node or just a node
-    # pos = nx.spring_layout(G, seed=41)
     pos = hierarchical_layout(G, list(G.nodes)[0])
     # position of nodes 
     plt.figure(figsize=(14, 10))
-    # well we're gonna need a space for this visualization
     nx.draw(G, pos, with_labels=True, node_color=colors, node_size=1500, font_size=10)
-    # visualizes the dawg yup
+    # visualizes the dawg 
     plt.title("Incremental DAWG Visualization")
     plt.axis('off')
-    # we dont need x or y axis
     edge_labels = {(u, v): d['label'] for u, v, d in G.edges(data=True)}
     # dictionary mapping edges to labels
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=7)
