@@ -24,7 +24,7 @@ class DAWGNode:
 
     def gen_signature(self):
         """
-        Creates a unique signature for this node: (is_end, weight, sorted children signatures)
+        Creates a unique signature for this node: *is_end*, *weight*, *sorted children signatures*
         Used to detect identical subtrees for merging.
         Assumes the children have the correct signature as this function will be used in a post order traversal.
         """
