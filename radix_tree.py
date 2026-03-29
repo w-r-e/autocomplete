@@ -63,8 +63,8 @@ class RadixTree:
         """
         Iterative insert of *word* / *weight* starting from *root*.
 
-        Walking the tree we look for a child whose edge label shares a prefix
-        with the remaining word.  Four cases arise at each step:
+        Walks through the tree looking for a child whose edge label shares a prefix
+        with the remaining word. Four cases arise at each step:
 
         1. No matching child  →  add a new leaf with the full remaining word.
         2. Full edge consumed, full word consumed  →  mark node as end.
