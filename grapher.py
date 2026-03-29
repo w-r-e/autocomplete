@@ -7,6 +7,7 @@ NUM_RUNS = 5
 
 
 def random_prefix_gen(words):
+    """Generates random prefixes for query testing"""
     prefix_source = random.choices(words, k=100)
     test_prefixes = []
     for word, _ in prefix_source:
@@ -18,6 +19,7 @@ def random_prefix_gen(words):
 
 
 def tester(words, sizes):
+    """Main testing program that returns a dictionary of results mapping data structure to another dictionary with the relevant test data"""
     results = {
         'trie': {'sizes': [], 'memory': [], 'setup_time': [], 'query_time': []},
         'radix': {'sizes': [], 'memory': [], 'setup_time': [], 'query_time': []},
@@ -51,6 +53,7 @@ def tester(words, sizes):
 
 
 def trie_tester(size, words, test_prefixes):
+    """Tests the memory query time and search time of a trie, returns a dictionary with set information"""
     results = {"sizes": [], "memory": [], "setup_time": [], "query_time": []}
 
     trie_setup_time = timeit.timeit(
@@ -76,6 +79,7 @@ def trie_tester(size, words, test_prefixes):
 
 
 def radix_tester(size, words, test_prefixes):
+    """Tests the memory query time and search time of a radix, returns a dictionary with set information"""
     results = {"sizes": [], "memory": [], "setup_time": [], "query_time": []}
 
     radix_setup_time = timeit.timeit(
@@ -101,6 +105,7 @@ def radix_tester(size, words, test_prefixes):
 
 
 def dawg_tester(size, words, test_prefixes):
+    """Tests the memory query time and search time of a dawg, returns a dictionary with set information"""
     results = {"sizes": [], "memory": [], "setup_time": [], "query_time": []}
 
     dawg_setup_time = timeit.timeit(
@@ -126,6 +131,7 @@ def dawg_tester(size, words, test_prefixes):
 
 
 def plot_MB_size(results):
+    """Plots memory against dataset size"""
     fig = graph.Figure()
 
     fig.add_trace(graph.Scatter(
@@ -170,8 +176,7 @@ def plot_MB_size(results):
 
 
 def plot_setup_size(results):
-    """Graph 2: Setup Time vs Dataset Size"""
-
+    """Plots setup size against dataset size"""
     fig = graph.Figure()
 
     fig.add_trace(graph.Scatter(
@@ -216,7 +221,7 @@ def plot_setup_size(results):
 
 
 def plot_query_size(results):
-    """Graph 3: Average Query Time vs Dataset Size (in milliseconds)"""
+    """Plots query size against dataset size"""
 
     fig = graph.Figure()
 
@@ -261,6 +266,7 @@ def plot_query_size(results):
     return fig
 
 def grapher_main(file):
+    """Main function to test and plot memory, set up time and query time across different dataset sizes"""
     words = load_words(file)
     sizes = [1000, 10000, 50000, 100000, 150000, 200000, 250000, 300000]
     results = tester(words, sizes)
