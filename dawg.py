@@ -31,7 +31,7 @@ class DAWGNode:
         # Generates the signature... Just used so that we can compare nodes and then say "HEY! these two are the same"
         # This way we can merge redundant nodes. EX: for "cats" and "bats", clearly both "t"s have the same children
         # are both not endings of words, and have the same weight of 0 (cause word weights are stored at the end)
-        # So we can just merge em!
+        # So we can just merge them
         # Note: We dont merge the "s"s in this example. This is because they both store different weights, so merging
         # would make it so that merging would combine the weights, which means that they would be considered equually
         # likely event if they aren't.
@@ -55,7 +55,7 @@ class IncrementalDAWG:
     """
     Incremental construction of a Directed Acyclic Word Graph (DAWG).
 
-    This class allows words to be inserted one at a time in !!!!lexicographical order!!!!,
+    This class allows words to be inserted one at a time in lexicographical order,
     maintaining a minimal DAWG at all times. It is based on the algorithm by Daciuk et al. (2000).
 
     Instance Attributes:
