@@ -17,7 +17,8 @@ files. Running this file starts the graphical interface described in Graphical I
 to generate visualizations as described in Structural Visualization and NetworkX.
 
 """
-from sys import prefix
+import sys
+import time
 
 from trie import Trie
 from radix_tree import RadixTree
@@ -75,25 +76,57 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
         listbox.insert(END, suggestion)
 
 if __name__ == "__main__":
-    words = load_words("unigram_freq.csv")
+    sys.setrecursionlimit(2950)
+    print("Loading datasets...")
+    words333333 = load_words("unigram_freq.csv")
+    words955213 = load_words("en_full.txt")
+    print("Datasets loaded successfully.")
 
-    # Pre-build all structures
-    time1 = timeit.timeit(lambda: trie_setup(words), number=1)
-    trie = trie_setup(words)
-    space1 = trie.get_total_memory()
-    # visualizations.export_tree(trie, "trie.txt")
 
-    time2 = timeit.timeit(lambda: radix_tree_setup(words), number=1)
-    radix = radix_tree_setup(words)
-    space2 = radix.get_total_memory()
-    # visualizations.export_tree(radix, "radix.txt")
+    # Building, timing, and recording memory usage for each structure and dataset
+    print("Building structures...")
+    # Trie with 333,333 word dataset
+    trie_setup_time_words333333 = time.time()
+    trie_words333333 = trie_setup(words333333)
+    trie_setup_time_words333333 = time.time() - trie_setup_time_words333333
+    trie_space_words333333 = trie_words333333.get_total_memory()
 
-    time3 = timeit.timeit(lambda: dawg_setup(words), number=1)
-    dawg = dawg_setup(words)
-    space3 = dawg.get_total_memory()
+    # Trie with 955,213 word dataset
+    trie_setup_time_words955213 = time.time()
+    trie_words955213 = trie_setup(words955213)
+    trie_setup_time_words955213 = time.time() - trie_setup_time_words955213
+    trie_space_words955213 = trie_words955213.get_total_memory()
+    # visualizations.export_tree(trie_words333333, "trie.txt")
+
+    # Radix Tree with 333,333 word dataset
+    radix_setup_time_words333333 = time.time()
+    radix_words333333 = radix_tree_setup(words333333)
+    radix_setup_time_words333333 = time.time() - radix_setup_time_words333333
+    radix_space_words333333 = radix_words333333.get_total_memory()
+
+    # Radix Tree with 955,213 word dataset
+    radix_setup_time_words955213 = time.time()
+    radix_words955213 = radix_tree_setup(words955213)
+    radix_setup_time_words955213 = time.time() - radix_setup_time_words955213
+    radix_space_words955213 = radix_words955213.get_total_memory()
+    # visualizations.export_tree(radix_words333333, "radix.txt")
+
+    # DAWG with 333,333 word dataset
+    dawg_setup_time_words333333 = time.time()
+    dawg_words333333 = dawg_setup(words333333)
+    dawg_setup_time_words333333 = time.time() - dawg_setup_time_words333333
+    dawg_space_words333333 = dawg_words333333.get_total_memory()
+
+    # DAWG with 955,213 word dataset
+    dawg_setup_time_words955213 = time.time()
+    dawg_words955213 = dawg_setup(words955213)
+    dawg_setup_time_words955213 = time.time() - dawg_setup_time_words955213
+    dawg_space_words955213 = dawg_words955213.get_total_memory()
+
+    print("Structures built successfully.")
 
     # Default structure
-    current_structure = {"obj": trie, "name": "trie", "time": time1, "space": space1}
+    current_structure = {"obj": trie_words333333, "name": "trie", "dataset": "333,333 words", "time": trie_setup_time_words333333, "space": trie_space_words333333}
 
     root = Tk()
     root.config(bg="dark grey")
@@ -107,27 +140,45 @@ if __name__ == "__main__":
                 f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB")
         info_label.config(text=text)
 
-    def switch_structure(name):
-        if name == "trie":
-            current_structure["obj"] = trie
-            current_structure["time"] = time1
-            current_structure["space"] = space1
+    def switch_structure(structure_name, dataset_name):
+        current_structure["name"] = structure_name
+        root.title(f"Autocomplete App ({structure_name})")
+        if dataset_name == "333,333 words":
+            current_structure["dataset"] = words333333
+            if structure_name == "trie":
+                current_structure["obj"] = trie_words333333
+                current_structure["time"] = trie_setup_time_words333333
+                current_structure["space"] = trie_space_words333333
 
-        elif name == "radix":
-            current_structure["obj"] = radix
-            current_structure["time"] = time2
-            current_structure["space"] = space2
+            elif structure_name == "radix":
+                current_structure["obj"] = radix_words333333
+                current_structure["time"] = radix_setup_time_words333333
+                current_structure["space"] = radix_space_words333333
 
+            else:
+                current_structure["obj"] = dawg_words333333
+                current_structure["time"] = dawg_setup_time_words333333
+                current_structure["space"] = dawg_space_words333333
         else:
-            current_structure["obj"] = dawg
-            current_structure["time"] = time3
-            current_structure["space"] = space3
+            current_structure["dataset"] = words955213
+            if structure_name == "trie":
+                current_structure["obj"] = trie_words955213
+                current_structure["time"] = trie_setup_time_words955213
+                current_structure["space"] = trie_space_words955213
 
-        current_structure["name"] = name
-        root.title(f"Autocomplete App ({name})")
+            elif structure_name == "radix":
+                current_structure["obj"] = radix_words955213
+                current_structure["time"] = radix_setup_time_words955213
+                current_structure["space"] = radix_space_words955213
 
-        # Clear suggestions when switching
+            else:
+                current_structure["obj"] = dawg_words955213
+                current_structure["time"] = dawg_setup_time_words955213
+                current_structure["space"] = dawg_space_words955213
+
+        # Clear word and suggestions when switching
         suggestions_listbox.delete(0, END)
+        entry.delete(0, END)
 
         # Update entry box with setup time
         update_info_labels()
@@ -137,18 +188,24 @@ if __name__ == "__main__":
         suggestion_time = timeit.timeit(
             lambda: update_suggestions(current_structure["obj"], entry, suggestions_listbox), number=1)
         text = (f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds | "
-                f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB | "
+                f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB\n"
                 f"suggestion time: {suggestion_time:.4f} seconds")
         info_label.config(text=text)
 
 
     # Buttons
-    button_frame = Frame(root, bg="dark grey")
-    button_frame.pack(pady=5)
+    structure_button_frame = Frame(root, bg="dark grey")
+    structure_button_frame.pack(pady=5)
 
-    Button(button_frame, text="Trie", command=lambda: switch_structure("trie")).pack(side="left", padx=5)
-    Button(button_frame, text="Radix", command=lambda: switch_structure("radix")).pack(side="left", padx=5)
-    Button(button_frame, text="DAWG", command=lambda: switch_structure("dawg")).pack(side="left", padx=5)
+    Button(structure_button_frame, text="Trie", command=lambda: switch_structure("trie", current_structure["dataset"])).pack(side="left", padx=5)
+    Button(structure_button_frame, text="Radix", command=lambda: switch_structure("radix", current_structure["dataset"])).pack(side="left", padx=5)
+    Button(structure_button_frame, text="DAWG", command=lambda: switch_structure("dawg", current_structure["dataset"])).pack(side="left", padx=5)
+
+    dataset_button_frame = Frame(root, bg="dark grey")
+    dataset_button_frame.pack(pady=5)
+
+    Button(dataset_button_frame, text="333,333 words", command=lambda: switch_structure(current_structure["name"], "333,333 words")).pack(side="left", padx=5)
+    Button(dataset_button_frame, text="955,213 words", command=lambda: switch_structure(current_structure["name"], "955,213 words")).pack(side="left", padx=5)
 
     # Entry + suggestions
     entry = Entry(root)
@@ -168,6 +225,6 @@ if __name__ == "__main__":
     entry.bind("<KeyRelease>", on_key_release)
 
     if current_structure["name"] == "dawg":
-        visualize_dawg(dawg, "ba", 10)
+        visualize_dawg(dawg_words333333, "ba", 10)
 
     root.mainloop()
