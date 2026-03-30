@@ -18,16 +18,17 @@ to generate visualizations as described in Structural Visualization and NetworkX
 
 """
 import sys
+from typing import Any
 import time
+from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
+import python_ta
 from trie import Trie
 from radix_tree import RadixTree
-from dawg import IncrementalDAWG, DAWGNode
+from dawg import IncrementalDAWG
 import visualizations
-from typing import Any
-from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
 
 
-def load_words(filename) -> list[Any]:
+def load_words(filename: str) -> list[Any]:
     """Method used to load words from a local CSV."""
     words = []
 
@@ -56,7 +57,6 @@ def radix_tree_setup(words: list[Any]) -> RadixTree:
 
 def dawg_setup(words: list[Any]) -> IncrementalDAWG:
     """Sets up the IncrementalDAWG with the given words and their weights."""
-    DAWGNode._next_node = 0
     dawg = IncrementalDAWG()
     for word, count in words:
         dawg.insert(word, count)
@@ -71,6 +71,7 @@ def update_suggestions(structure: Trie | RadixTree | IncrementalDAWG, entry: Ent
         return
     for suggestion in structure.search(prefix, k=10):
         listbox.insert(END, suggestion)
+
 
 if __name__ == "__main__":
     sys.setrecursionlimit(2950)
@@ -122,7 +123,8 @@ if __name__ == "__main__":
     print("Structures built successfully.")
 
     # Default structure
-    current_structure = {"obj": trie_words333333, "name": "trie", "dataset": "333,333 words", "time": trie_setup_time_words333333, "space": trie_space_words333333}
+    current_structure = {"obj": trie_words333333, "name": "trie", "dataset": "333,333 words",
+                         "time": trie_setup_time_words333333, "space": trie_space_words333333}
 
     # Set up the GUI
     root = Tk()
@@ -132,13 +134,13 @@ if __name__ == "__main__":
     info_label = Label(root, text="", bg="dark grey", fg="black")
     info_label.pack(pady=10)
 
-    def update_info_labels():
+    def update_info_labels() -> None:
         """Updates the info label with the current structure's setup time and memory usage."""
         text = (f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds | "
                 f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB")
         info_label.config(text=text)
 
-    def switch_structure(structure_name, dataset_name):
+    def switch_structure(structure_name: str, dataset_name: str) -> None:
         """Switches the current structure and dataset, updating the info label and clearing suggestions."""
         current_structure["name"] = structure_name
         current_structure["dataset"] = dataset_name
@@ -176,46 +178,51 @@ if __name__ == "__main__":
 
         # Clear word and suggestions when switching
         suggestions_listbox.delete(0, END)
-        entry.delete(0, END)
+        entry_box.delete(0, END)
 
         # Update entry box with setup time
         update_info_labels()
 
-    def on_key_release(event):
+    def on_key_release(event: Any) -> None:
         """Handles key release events in the entry box, updating suggestions and timing the search."""
         suggestion_time = time.time()
-        update_suggestions(current_structure["obj"], entry, suggestions_listbox)
+        update_suggestions(current_structure["obj"], entry_box, suggestions_listbox)
         suggestion_time = time.time() - suggestion_time
         text = (f"{current_structure['name']} setup time: {current_structure['time']:.4f} seconds | "
                 f"memory: {current_structure['space'] / (1024 ** 2):.4f} MB\n"
                 f"suggestion time: {suggestion_time:.4f} seconds")
         info_label.config(text=text)
 
-    def export_visualization(entry: str):
+    def export_visualization(entered_text: str) -> None:
         """Exports a visualization of the current structure.
         For the Trie and Radix Tree, it exports a text file with the tree structure.
         For the DAWG, produces a graph using NetworkX."""
         if current_structure["name"] == "trie" or current_structure["name"] == "radix":
             visualizations.export_tree(current_structure["obj"], "trie.txt")
         elif current_structure["name"] == "dawg":
-            visualizations.visualize_dawg(current_structure["obj"], entry, 10)
+            visualizations.visualize_dawg(current_structure["obj"], entered_text, 10)
 
     # Structure buttons
     structure_button_frame = Frame(root, bg="dark grey")
     structure_button_frame.pack(pady=5)
-    Button(structure_button_frame, text="Trie", command=lambda: switch_structure("trie", current_structure["dataset"])).pack(side="left", padx=5)
-    Button(structure_button_frame, text="Radix", command=lambda: switch_structure("radix", current_structure["dataset"])).pack(side="left", padx=5)
-    Button(structure_button_frame, text="DAWG", command=lambda: switch_structure("dawg", current_structure["dataset"])).pack(side="left", padx=5)
+    Button(structure_button_frame, text="Trie",
+           command=lambda: switch_structure("trie", current_structure["dataset"])).pack(side="left", padx=5)
+    Button(structure_button_frame, text="Radix",
+           command=lambda: switch_structure("radix", current_structure["dataset"])).pack(side="left", padx=5)
+    Button(structure_button_frame, text="DAWG",
+           command=lambda: switch_structure("dawg", current_structure["dataset"])).pack(side="left", padx=5)
 
     # Dataset buttons
     dataset_button_frame = Frame(root, bg="dark grey")
     dataset_button_frame.pack(pady=5)
-    Button(dataset_button_frame, text="333,333 words", command=lambda: switch_structure(current_structure["name"], "333,333 words")).pack(side="left", padx=5)
-    Button(dataset_button_frame, text="955,213 words", command=lambda: switch_structure(current_structure["name"], "955,213 words")).pack(side="left", padx=5)
-    
+    Button(dataset_button_frame, text="333,333 words",
+           command=lambda: switch_structure(current_structure["name"], "333,333 words")).pack(side="left", padx=5)
+    Button(dataset_button_frame, text="955,213 words",
+           command=lambda: switch_structure(current_structure["name"], "955,213 words")).pack(side="left", padx=5)
+
     # Entry + suggestions
-    entry = Entry(root)
-    entry.pack(padx=10, pady=10)
+    entry_box = Entry(root)
+    entry_box.pack(padx=10, pady=10)
 
     suggestions_listbox = Listbox(
         root,
@@ -228,10 +235,11 @@ if __name__ == "__main__":
 
     update_info_labels()
 
-    entry.bind("<KeyRelease>", on_key_release)
+    entry_box.bind("<KeyRelease>", on_key_release)
 
     visualizations_button_frame = Frame(root, bg="dark grey")
     visualizations_button_frame.pack(pady=5)
-    Button(visualizations_button_frame, text="Visualize structure", command=lambda: export_visualization(entry.get())).pack(side="left", padx=5)
+    Button(visualizations_button_frame, text="Visualize structure",
+           command=lambda: export_visualization(entry_box.get())).pack(side="left", padx=5)
 
     root.mainloop()

@@ -1,5 +1,9 @@
 # CSC111 Winter 2026: Project dependencies
 
+# Testing and code checking
+pytest
+python-ta
+
 # Data visualization
 plotly
 matplotlib
