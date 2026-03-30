@@ -6,6 +6,11 @@ Module Description
 This module contains a collection of Python functions that create three different graphs that
 compares each type of data structure against dataset size to visually measure all their efficiencies
 compared to each other.
+
+NOTE: This module is not intended to be run, as it is only useful when running on large sized datasets,
+which takes up to 20 minutes for all the testing and rendering. We have used this module to generate
+The graphs for the report, and you may run this module indepenedently if you are so inclined, or simply
+paste the pathname of the html files in our submission into your browser.
 """
 
 from main import load_words, dawg_setup, trie_setup, radix_tree_setup
@@ -13,7 +18,7 @@ from plotly import graph_objects as graph
 import random
 import timeit
 
-NUM_RUNS = 5
+NUM_RUNS = 15
 
 
 def random_prefix_gen(words):
