@@ -21,7 +21,6 @@ import sys
 from typing import Any
 import time
 from tkinter import Tk, Entry, Listbox, Button, Frame, Label, END
-import python_ta
 from trie import Trie
 from radix_tree import RadixTree
 from dawg import IncrementalDAWG
