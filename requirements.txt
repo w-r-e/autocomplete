@@ -1,0 +1,6 @@
+# CSC111 Winter 2026: Project dependencies
+
+# Data visualization
+plotly
+matplotlib
+networkx

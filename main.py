@@ -10,7 +10,7 @@ demonstration of how an autocomplete algorithm would work and the efficiency of 
 Instructions
 =============
 
-All libraries used are part of the Python standard library, so no external library installation is required.
+Please install the libraries specified in the requirements.txt file.
 The two datasets used by the program are contained in the compressed folder datasets.zip uploaded to
 MarkUs. Please unzip the folder and move the two dataset files to the same folder as the other program
 files. Running this file starts the graphical interface described in Graphical Interface, including the button
