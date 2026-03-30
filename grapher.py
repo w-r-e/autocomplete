@@ -1,12 +1,12 @@
 """Grapher
 
-Module Description 
+Module Description
 ==================
 
 This module contains a collection of Python functions that create three different graphs that
 compares each type of data structure against dataset size to visually measure all their efficiencies
-compared to each other. 
-""" 
+compared to each other.
+"""
 
 from main import load_words, dawg_setup, trie_setup, radix_tree_setup
 from plotly import graph_objects as graph
@@ -29,7 +29,8 @@ def random_prefix_gen(words):
 
 
 def tester(words, sizes):
-    """Main testing program that returns a dictionary of results mapping data structure to another dictionary with the relevant test data"""
+    """Main testing program that returns a dictionary of results mapping data structure to
+    another dictionary with the relevant test data"""
     results = {
         'trie': {'sizes': [], 'memory': [], 'setup_time': [], 'query_time': []},
         'radix': {'sizes': [], 'memory': [], 'setup_time': [], 'query_time': []},
@@ -75,6 +76,7 @@ def trie_tester(size, words, test_prefixes):
     trie_memory = trie.get_total_memory()
 
     def query_trie():
+        """Quick Internal Query Function for Timeit"""
         for prefix in test_prefixes:
             trie.search(prefix, k=10)
 
@@ -101,6 +103,7 @@ def radix_tester(size, words, test_prefixes):
     radix_memory = radix.get_total_memory()
 
     def query_radix():
+        """Quick Internal Query Function for Timeit"""
         for prefix in test_prefixes:
             radix.search(prefix, k=10)
 
@@ -127,6 +130,7 @@ def dawg_tester(size, words, test_prefixes):
     dawg_memory = dawg.get_total_memory()
 
     def query_dawg():
+        """Quick Internal Query Function for Timeit"""
         for prefix in test_prefixes:
             dawg.search(prefix, k=10)
 
@@ -140,7 +144,7 @@ def dawg_tester(size, words, test_prefixes):
     return results
 
 
-def plot_MB_size(results):
+def plot_mb_size(results):
     """Plots memory against dataset size"""
     fig = graph.Figure()
 
@@ -275,13 +279,14 @@ def plot_query_size(results):
 
     return fig
 
+
 def grapher_main(file):
     """Main function to test and plot memory, set up time and query time across different dataset sizes"""
     words = load_words(file)
     sizes = [1000, 10000, 50000, 100000, 150000, 200000, 250000, 300000]
     results = tester(words, sizes)
 
-    fig_memory = plot_MB_size(results)
+    fig_memory = plot_mb_size(results)
     fig_memory.write_html("memory_vs_size.html")
     fig_memory.show()
 
@@ -295,7 +300,6 @@ def grapher_main(file):
 
     return results
 
+
 if __name__ == "__main__":
     results = grapher_main("unigram_freq.csv")
-
-# TODO: Wait move all setups to each implement???

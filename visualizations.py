@@ -1,5 +1,5 @@
 """
-Visualizations 
+Visualizations
 
 Module Description
 ==================
@@ -13,8 +13,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from trie import Trie
 from radix_tree import RadixTree
-from dawg import IncrementalDAWG, DAWGNode
+from dawg import IncrementalDAWG
 from collections import deque, defaultdict
+
 
 def hierarchical_layout(G, root):
     """Create a cleaner, more structured layout for DAWG visualization"""
@@ -54,11 +55,11 @@ def hierarchical_layout(G, root):
 
     return pos
 
+
 def visualize_dawg(dawg: IncrementalDAWG, prefix: str, k: int = 10) -> None:
     """Visualize the IncrementalDAWG subgraph of top-k autocorrrect results using NetworkX."""
     G = nx.DiGraph()
     # creates direct graph G
-    visited = set()
     top_words = dawg.search(prefix, k)
 
     def add_nodes_and_edges(word):
@@ -81,10 +82,10 @@ def visualize_dawg(dawg: IncrementalDAWG, prefix: str, k: int = 10) -> None:
     colors = ['lightgreen' if G.nodes[n]['is_end'] else 'lightgray' for n in G.nodes]
     # diff colors whether the node is an end-of-the-word node or just a node
     pos = hierarchical_layout(G, list(G.nodes)[0])
-    # position of nodes 
+    # position of nodes
     plt.figure(figsize=(14, 10))
     nx.draw(G, pos, with_labels=True, node_color=colors, node_size=1500, font_size=10)
-    # visualizes the dawg 
+    # visualizes the dawg
     plt.title("Incremental DAWG Visualization")
     plt.axis('off')
     edge_labels = {(u, v): d['label'] for u, v, d in G.edges(data=True)}
@@ -95,9 +96,10 @@ def visualize_dawg(dawg: IncrementalDAWG, prefix: str, k: int = 10) -> None:
 
 
 def export_tree(structure: Trie | RadixTree, filename: str) -> None:
-    """Exports a ASCII tree visualization of the structure."""
+    """Exports an ASCII tree visualization of the structure."""
 
     def write_trie(node, prefix, f, indent="", last=True, char=""):
+        """Internal helper function to write a Trie Object"""
         connector = "└── " if last else "├── "
 
         if char:
@@ -114,6 +116,7 @@ def export_tree(structure: Trie | RadixTree, filename: str) -> None:
             write_trie(child, prefix + c, f, new_indent, is_last, c)
 
     def write_radix(node, prefix, f, indent="", last=True, label=""):
+        """Internal helper function to write a Radix Object"""
         connector = "└── " if last else "├── "
 
         if label:

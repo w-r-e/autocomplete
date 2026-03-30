@@ -1,13 +1,14 @@
 """Dawg Implementation
 
-Module Description 
+Module Description
 ===================
 
-This module includes two classes used to implement a data structure that (in this case) is used to search 
+This module includes two classes used to implement a data structure that (in this case) is used to search
 through all the possible suffixes of a prefix the user types in and combines common ends to sort in
 a more efficient way with minimal memory usage and a better time complexity for searching."""
 
 import sys
+
 
 class DAWGNode:
     """Class that represents a Node in the Directed Acyclic Word Graph (DAWG).
@@ -36,9 +37,9 @@ class DAWGNode:
         Used to detect identical subtrees for merging.
         Assumes the children have the correct signature as this function will be used in a post order traversal.
         """
-        
+
         if self.is_end:
-            self.signature = (True, self.node_id)  
+            self.signature = (True, self.node_id)
         else:
             child_items = []
             for ch, child in sorted(self.children.items()):

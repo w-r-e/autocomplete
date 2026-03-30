@@ -4,13 +4,14 @@ Radix Tree Implementation
 Module Description
 ==================
 
-Contains a file of classes and functions that implements the Radix Tree data 
+Contains a file of classes and functions that implements the Radix Tree data
 sturcture that is a more space optimized way to store multiple letters (suffix)
-in a singular node. 
+in a singular node.
 
 """
 
 import sys
+
 
 class RadixNode:
     """
