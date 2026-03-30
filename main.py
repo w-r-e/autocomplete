@@ -127,7 +127,7 @@ if __name__ == "__main__":
     # Set up the GUI
     root = Tk()
     root.config(bg="dark grey")
-    root.title("Autocomplete App")
+    root.title("Autocomplete App (trie, 333,333 words)")
 
     info_label = Label(root, text="", bg="dark grey", fg="black")
     info_label.pack(pady=10)
@@ -141,9 +141,9 @@ if __name__ == "__main__":
     def switch_structure(structure_name, dataset_name):
         """Switches the current structure and dataset, updating the info label and clearing suggestions."""
         current_structure["name"] = structure_name
-        root.title(f"Autocomplete App ({structure_name})")
+        current_structure["dataset"] = dataset_name
+        root.title(f"Autocomplete App ({structure_name}, {dataset_name})")
         if dataset_name == "333,333 words":
-            current_structure["dataset"] = words333333
             if structure_name == "trie":
                 current_structure["obj"] = trie_words333333
                 current_structure["time"] = trie_setup_time_words333333
@@ -159,7 +159,6 @@ if __name__ == "__main__":
                 current_structure["time"] = dawg_setup_time_words333333
                 current_structure["space"] = dawg_space_words333333
         else:
-            current_structure["dataset"] = words955213
             if structure_name == "trie":
                 current_structure["obj"] = trie_words955213
                 current_structure["time"] = trie_setup_time_words955213
