@@ -79,16 +79,6 @@ Use DAWG for memory efficiency
 Use Trie for fastest setup
 Use Radix Tree for balanced performance
 
-## Project Structure
-├── main.py              # GUI entry point
-├── trie.py              # Standard Trie implementation
-├── radix_tree.py        # Radix Tree implementation
-├── dawg.py              # DAWG implementation
-├── grapher.py           # Benchmarking and graph generation
-├── datasets.zip         # Word-frequency datasets
-├── requirements.txt     # Dependencies
-├── *.html               # Pre-generated graphs
-
 ## Limitations
 Dataset contains mostly unique weights, limiting DAWG compression
 Memory measurements are approximate (sys.getsizeof)
