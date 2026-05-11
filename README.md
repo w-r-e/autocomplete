@@ -95,6 +95,9 @@ Parallelize DAWG construction
 
 ## Authors
 Liam Evans
+
 Dana Lee
+
 Kyra Park
+
 Shiv Rajeev
